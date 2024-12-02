@@ -10,6 +10,7 @@ public class AggressiveStateMachine : MonoBehaviour
     [SerializeField] Texture[] moods;
     NavMeshAgent agent;
     private float timer;
+    private float escapeTimer = 315360000;
     private Vector3 playerscent;
 
     public enum State
@@ -55,6 +56,7 @@ public class AggressiveStateMachine : MonoBehaviour
                 StartCoroutine(AttackState());
                 break;
             case State.Captured:
+                StartCoroutine(CapturedState());
                 break;
             default:
                 Debug.LogError("State doesn't exist");
@@ -64,7 +66,7 @@ public class AggressiveStateMachine : MonoBehaviour
 
     IEnumerator PatrolState()
     {
-        moodDisplay.SetTexture("_MainTex", moods[3]);
+        moodDisplay.SetTexture("_MainTex", moods[0]);
         //Setup /entry point / Start()/Awake()
         Debug.Log("Entering Patrol State");
 
@@ -97,7 +99,7 @@ public class AggressiveStateMachine : MonoBehaviour
 
     IEnumerator InvestigatingState()
     {
-        moodDisplay.SetTexture("_MainTex", moods[0]);
+        moodDisplay.SetTexture("_MainTex", moods[1]);
         //Setup /entry point / Start()/Awake()
         Debug.Log("Entering Investigating State");
         float startTime = Time.time;
@@ -141,7 +143,7 @@ public class AggressiveStateMachine : MonoBehaviour
 
     IEnumerator ChasingState()
     {
-        moodDisplay.SetTexture("_MainTex", moods[1]);
+        moodDisplay.SetTexture("_MainTex", moods[2]);
         //Setup /entry point / Start()/Awake()
         Debug.Log("Entering Chasing State");
 
@@ -200,7 +202,7 @@ public class AggressiveStateMachine : MonoBehaviour
 
     IEnumerator AttackState()
     {
-        moodDisplay.SetTexture("_MainTex", moods[2]);
+        moodDisplay.SetTexture("_MainTex", moods[3]);
         //Setup /entry point / Start()/Awake()
         Debug.Log("Entering Attack State");
 
@@ -213,7 +215,7 @@ public class AggressiveStateMachine : MonoBehaviour
             Vector3 directionToPlayer = player.transform.position - transform.position;
             if (directionToPlayer.magnitude > 3f)
             {
-                state = State.Chasing;
+                state = State.Captured;
             }
 
             yield return null; // Wait for a frame
@@ -221,6 +223,25 @@ public class AggressiveStateMachine : MonoBehaviour
 
         //tear down/ exit  point  / OnDestory()
         Debug.Log("Exiting Attack State");
+        NextState();
+    }
+
+    IEnumerator CapturedState()
+    {
+        Debug.Log("Entering Captured State");
+        moodDisplay.SetTexture("_MainTex", moods[4]);
+        while (state == State.Captured)
+        {
+            escapeTimer -= Time.deltaTime;
+            if (escapeTimer <= 0)
+            {
+                state = State.Attack;
+                escapeTimer = 315360000;
+            }
+            agent.SetDestination(Vector3.back + player.transform.position);
+            yield return null;
+        }
+        Debug.Log("Exiting Captured State");
         NextState();
     }
 }

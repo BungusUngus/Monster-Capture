@@ -19,7 +19,6 @@ public class PassiveStateMachine : MonoBehaviour
     public enum State
     {
         Wandering,
-        Scanning,
         Attentive,
         Fleeing,
         Captured
@@ -101,9 +100,17 @@ public class PassiveStateMachine : MonoBehaviour
                 agent.speed = 8;
                 //switches to fleeing 
                 state = State.Fleeing;
+                
             }
+
+            if (Vector3.Distance(transform.position, player.transform.position) > 19)
+            {
+                state = State.Wandering;
+            }
+
             transform.LookAt(player.transform.position);
             yield return null;
+           
         }
 
         Debug.Log("Exiting Attentive State");

@@ -61,7 +61,7 @@ public class PlayerController : MonoBehaviour
 
         if (isGrounded)
         {
-            rb.velocity = Vector3.SmoothDamp(rb.velocity, new Vector3(input.x, rb.velocity.y, input.z),
+            rb.linearVelocity = Vector3.SmoothDamp(rb.linearVelocity, new Vector3(input.x, rb.linearVelocity.y, input.z),
                                             ref dampVelocity, 0.1f);
             airDampVelocity = Vector2.zero;
         }
@@ -69,11 +69,11 @@ public class PlayerController : MonoBehaviour
         {
             dampVelocity = Vector3.zero;
             rb.AddForce(new Vector3(input.x, 0f, input.z) * airControlMultiplier, ForceMode.Acceleration);
-            Vector2 xzMovement = new Vector2(rb.velocity.x, rb.velocity.z);
+            Vector2 xzMovement = new Vector2(rb.linearVelocity.x, rb.linearVelocity.z);
             {
                 xzMovement = Vector2.SmoothDamp(xzMovement, xzMovement.normalized * maxSpeed, ref airDampVelocity, 0.1f);
                 //below returns the original speed
-                rb.velocity = new Vector3(xzMovement.x, rb.velocity.y, xzMovement.y);
+                rb.linearVelocity = new Vector3(xzMovement.x, rb.linearVelocity.y, xzMovement.y);
             }
         }
     }
